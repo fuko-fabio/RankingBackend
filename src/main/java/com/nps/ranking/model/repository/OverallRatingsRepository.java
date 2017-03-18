@@ -16,5 +16,5 @@ public interface OverallRatingsRepository extends PagingAndSortingRepository<Ove
      *
      * @param itemId the item ID.
      */
-    List<OverallRating> findByItemId(String itemId);
+    OverallRating findByItemId(String itemId);
 }

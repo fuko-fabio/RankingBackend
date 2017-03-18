@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +30,7 @@ public class RatingRepositoryTests {
 
     @Test
     public void reateRatingTest() throws Exception {
-        Rating rating = ratingRepository.save(aRating(5));
+        Rating rating = aRating(5);
 
         assertThat(rating).isNotNull();
         assertThat(rating.getItemId()).isEqualTo(ITEM_ID);
@@ -39,14 +40,14 @@ public class RatingRepositoryTests {
 
     @Test
     public void updateRatingTest() throws Exception {
-        Rating rating = ratingRepository.save(aRating(3));
+        Rating rating = aRating(3);
 
         assertThat(rating.getItemId()).isEqualTo(ITEM_ID);
         assertThat(rating.getRaterId()).isEqualTo(RATER_ID);
         assertThat(rating.getValue()).isEqualTo(3);
 
         rating.setValue(8);
-        rating = ratingRepository.save(aRating(8));
+        rating = aRating(8);
 
         assertThat(rating.getItemId()).isEqualTo(ITEM_ID);
         assertThat(rating.getRaterId()).isEqualTo(RATER_ID);
@@ -57,7 +58,7 @@ public class RatingRepositoryTests {
     public void findRatingTest() throws Exception {
         String itemId = "myItem";
         String raterId = "myRater";
-        Rating rating = ratingRepository.save(aRating(itemId, 1));
+        Rating rating = aRating(itemId, 1);
         rating = ratingRepository.findOne(rating.getId());
 
         assertThat(rating.getItemId()).isEqualTo(itemId);
@@ -67,16 +68,23 @@ public class RatingRepositoryTests {
         assertThat(ratings.size()).isEqualTo(1);
         assertThat(ratings.get(0).getItemId()).isEqualTo(itemId);
 
-        ratingRepository.save(aRating(itemId, 1, raterId));
+        aRating(itemId, 1, raterId);
         ratings = ratingRepository.findByRaterId(raterId);
 
         assertThat(ratings.size()).isEqualTo(1);
         assertThat(ratings.get(0).getRaterId()).isEqualTo(raterId);
+
+        rating = ratingRepository.findByItemIdAndRaterId(itemId, raterId);
+        assertThat(rating).isNotNull();
+        assertThat(rating.getItemId()).isEqualTo(itemId);
+
+        rating = ratingRepository.findByItemIdAndRaterId(itemId, "notExisting");
+        assertThat(rating).isNull();
     }
 
     @Test
     public void deleteRatingTest() throws Exception {
-        ratingRepository.save(aRating("toDelete", 1));
+        aRating("toDelete", 1);
         List<Rating> ratings = ratingRepository.findByItemId("toDelete");
 
         assertThat(ratings.size()).isEqualTo(1);
@@ -84,6 +92,19 @@ public class RatingRepositoryTests {
         ratingRepository.delete(ratings.get(0).getId());
         ratings = ratingRepository.findByItemId("toDelete");
         assertThat(ratings.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void getOverallRatingDataTest() {
+        aRating("rankingData", 6, "1");
+        aRating("rankingData", 7, "2");
+        aRating("rankingData", 3, "3");
+        aRating("rankingData", 4, "4");
+
+        Map<String, Object> result = ratingRepository.getOverallRatingData("rankingData");
+        assertThat(result.isEmpty()).isFalse();
+        assertThat((Long) result.get("count")).isEqualTo(4);
+        assertThat((Double) result.get("average")).isEqualTo(5.0);
     }
 
     private Rating aRating(int value) {
@@ -95,6 +116,6 @@ public class RatingRepositoryTests {
     }
 
     private Rating aRating(String itemId, int value, String raterId) {
-        return new Rating(itemId, value, raterId);
+        return ratingRepository.save(new Rating(itemId, value, raterId));
     }
 }

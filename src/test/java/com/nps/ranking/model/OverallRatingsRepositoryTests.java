@@ -67,6 +67,13 @@ public class OverallRatingsRepositoryTests {
         Page<OverallRating> results = overallRatingsRepository.findAll(new PageRequest(1, 20));
 
         assertThat(results.getTotalElements()).isEqualTo(10);
+
+        OverallRating or = overallRatingsRepository.findByItemId("ID10");
+        assertThat(or).isNotNull();
+        assertThat(or.getRating()).isEqualTo(3.5f);
+
+        or = overallRatingsRepository.findByItemId("notExisting");
+        assertThat(or).isNull();
     }
 
     @Test

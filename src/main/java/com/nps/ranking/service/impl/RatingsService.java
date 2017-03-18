@@ -16,15 +16,15 @@ public class RatingsService implements IRatingService {
 
     private final RatingsRepository ratingsRepository;
     private final RatingsConverter ratingsConverter;
-    private final OverallRatingCalculator overallRatingCalculator;
+    private final OverallRatingsService overallRatingsService;
 
     @Autowired
     public RatingsService(RatingsRepository ratingsRepository,
                           RatingsConverter ratingsConverter,
-                          OverallRatingCalculator overallRatingCalculator) {
+                          OverallRatingsService overallRatingsService) {
         this.ratingsRepository = ratingsRepository;
         this.ratingsConverter = ratingsConverter;
-        this.overallRatingCalculator = overallRatingCalculator;
+        this.overallRatingsService = overallRatingsService;
     }
 
     @Override
@@ -33,23 +33,28 @@ public class RatingsService implements IRatingService {
     }
 
     @Override
+    public RatingDTO getByItemIdAndRaterId(String itemId, String raterId) {
+        return ratingsConverter.toDto(ratingsRepository.findByItemIdAndRaterId(itemId, raterId));
+    }
+
+    @Override
     public void delete(Long id) {
         Rating rating = ratingsRepository.findOne(id);
         ratingsRepository.delete(rating.getId());
-        overallRatingCalculator.calculate(rating.getItemId());
+        overallRatingsService.onRatingChanged(rating.getItemId());
     }
 
     @Override
     public RatingDTO update(RatingDTO rating) {
         RatingDTO result = ratingsConverter.toDto(ratingsRepository.save(ratingsConverter.toEntity(rating)));
-        overallRatingCalculator.calculate(result.getItemId());
+        overallRatingsService.onRatingChanged(result.getItemId());
         return result;
     }
 
     @Override
     public RatingDTO create(RatingDTO rating) {
         RatingDTO result = ratingsConverter.toDto(ratingsRepository.save(ratingsConverter.toEntity(rating)));
-        overallRatingCalculator.calculate(result.getItemId());
+        overallRatingsService.onRatingChanged(result.getItemId());
         return result;
     }
 }

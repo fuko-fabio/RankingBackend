@@ -1,21 +1,36 @@
 package com.nps.ranking.model.dto;
 
+import org.jsondoc.core.annotation.ApiObject;
+import org.jsondoc.core.annotation.ApiObjectField;
+
 /**
  * Created by Norbert Pabian on 17.03.17
  */
+@ApiObject(name = "OverallRating")
 public class OverallRatingDTO {
 
+    @ApiObjectField(description = "Rating ID")
     private Long id;
-    private Long itemId;
+
+    @ApiObjectField(description = "Item ID")
+    private String itemId;
+
+    @ApiObjectField(description = "Rating value")
     private Float rating;
+
+    @ApiObjectField(description = "Ratings total count")
     private Integer ratingsCount;
 
+    @ApiObjectField(description = "Item was rated by current user/rater")
     private Boolean rated;
+
+    @ApiObjectField(description = "Item data referenced by item ID. Can be empty. See configuration")
+    private Object itemData;
 
     public OverallRatingDTO() {
     }
 
-    public OverallRatingDTO(Long id, Long itemId, Float rating, Integer ratingsCount, Boolean rated) {
+    public OverallRatingDTO(Long id, String itemId, Float rating, Integer ratingsCount, Boolean rated) {
         this.id = id;
         this.rating = rating;
         this.ratingsCount = ratingsCount;
@@ -31,11 +46,11 @@ public class OverallRatingDTO {
         this.id = id;
     }
 
-    public long getItemId() {
+    public String getItemId() {
         return itemId;
     }
 
-    public void setItemId(long itemId) {
+    public void setItemId(String itemId) {
         this.itemId = itemId;
     }
 
@@ -63,4 +78,11 @@ public class OverallRatingDTO {
         this.rated = rated;
     }
 
+    public Object getItemData() {
+        return itemData;
+    }
+
+    public void setItemData(Object itemData) {
+        this.itemData = itemData;
+    }
 }

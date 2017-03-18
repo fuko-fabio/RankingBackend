@@ -9,9 +9,11 @@ public interface IRatingService {
 
     RatingDTO getById(Long id);
 
-    void delete(Long id);
+    RatingDTO getByItemIdAndRaterId(String itemId, String raterId);
 
     RatingDTO update(RatingDTO rating);
 
     RatingDTO create(RatingDTO rating);
+
+    void delete(Long id);
 }
