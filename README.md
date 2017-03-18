@@ -14,12 +14,12 @@ Open file `application-dev.properties` and provide your database connection info
 mvn spring-boot:run
 ```
 
-##API
+## API
 Run app and open url:
 ```
 http://localhost:8080/jsondoc-ui.html
 ```
-Pasete JSONDoc URL:
+Paste JSONDoc URL:
 ```
 http://localhost:8080/jsondoc
 ```
@@ -30,7 +30,7 @@ You can play around with API.
 Let's say you have book store an you wan to add ranking system for books.
 
 ### 1. Configure rest data provider
-Open configuration file: `rest-data-provider.properties` and provide url to your system where from wee can get book details by ID.
+Open configuration file: `rest-data-provider.properties` and provide url to your system where from we can get book details by ID.
 Example:
 ```
 https://awesome.books.com/rest/books/%{id}
@@ -48,7 +48,7 @@ Example response from your server:
 }
 ```
 
-You can disable this integration and integrate on frontend side. To disable change configuration property:
+You can disable this integration. To disable change configuration property:
 ```
 ranking.externalItemDataEnabled=false
 ```
