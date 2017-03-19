@@ -9,7 +9,12 @@ import org.jsondoc.core.pojo.ApiStage;
 import org.jsondoc.core.pojo.ApiVisibility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.xml.ws.Response;
 
 /**
  * Created by Norbert Pabian on 17.03.17
@@ -28,7 +33,7 @@ public class RankingController {
         this.overallRatingService = overallRatingService;
     }
 
-    @ApiMethod(description = "Returns pageable items ranking")
+    @ApiMethod(description = "Returns pageable ranking items")
     @RequestMapping(method = RequestMethod.GET)
     public @ApiResponseObject Page<OverallRatingDTO> getPage(
             @ApiQueryParam(description = "Page number")
@@ -40,12 +45,14 @@ public class RankingController {
         return overallRatingService.getPaginated(page, size, raterId);
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public @ApiResponseObject OverallRatingDTO getOverallRating(
-            @ApiPathParam(description = "Overall rating ID")
-            @PathVariable Long id,
+    @ApiMethod(description = "Returns single overall rating for one item bu it's ID")
+    @RequestMapping(path = "/{itemId}", method = RequestMethod.GET)
+    public @ApiResponseObject ResponseEntity<OverallRatingDTO> getOverallRating(
+            @ApiPathParam(description = "Overall rating ID", name = "itemId")
+            @PathVariable String itemId,
             @ApiQueryParam(description = "Rater ID")
             @RequestParam(value = "raterId", required = false) String raterId) {
-        return overallRatingService.getOverallRating(id, raterId);
+        OverallRatingDTO result = overallRatingService.getOverallRatingForItem(itemId, raterId);
+        return result != null ? new ResponseEntity<>(result, HttpStatus.OK) : new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 }

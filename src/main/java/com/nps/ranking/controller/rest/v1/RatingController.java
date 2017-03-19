@@ -2,11 +2,14 @@ package com.nps.ranking.controller.rest.v1;
 
 import com.nps.ranking.model.dto.RatingDTO;
 import com.nps.ranking.service.api.IRatingService;
+import com.nps.ranking.service.api.RatingServiceException;
 import com.nps.ranking.service.impl.RatingsService;
 import org.jsondoc.core.annotation.*;
 import org.jsondoc.core.pojo.ApiStage;
 import org.jsondoc.core.pojo.ApiVisibility;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -28,36 +31,40 @@ public class RatingController {
 
     @ApiMethod(description = "Gets rating object by item ID and rater ID")
     @RequestMapping(method = RequestMethod.GET, params = {"itemId", "raterId"})
-    public @ApiResponseObject RatingDTO find(
+    public @ApiResponseObject ResponseEntity<RatingDTO> find(
             @ApiQueryParam(description = "Item ID", name = "itemId")
             @RequestParam String itemId,
             @ApiQueryParam(description = "Rater ID", name = "raterId")
             @RequestParam String raterId) {
-        return ratingService.getByItemIdAndRaterId(itemId, raterId);
+        return ratingResponse(ratingService.getByItemIdAndRaterId(itemId, raterId));
     }
 
     @ApiMethod(description = "Gets rating object by rating ID ")
     @RequestMapping(value = "/{ratingId}", method = RequestMethod.GET)
-    public @ApiResponseObject RatingDTO getById(
+    public @ApiResponseObject ResponseEntity<RatingDTO> getById(
             @ApiPathParam(description = "Rating ID", name = "ratingId")
             @PathVariable Long ratingId) {
-        return ratingService.getById(ratingId);
+        return ratingResponse(ratingService.getById(ratingId));
     }
 
     @ApiMethod(description = "Creates rating object")
     @RequestMapping(method = RequestMethod.POST)
-    public void create(
+    public @ApiResponseObject ResponseEntity<RatingDTO> create(
             @ApiBodyObject
             @RequestBody RatingDTO rating) {
-        ratingService.create(rating);
+        try {
+            return ratingResponse(ratingService.create(rating));
+        } catch (RatingServiceException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @ApiMethod(description = "Updates rating object")
     @RequestMapping(value = "/{ratingId}", method = RequestMethod.PUT)
-    public void update(
+    public @ApiResponseObject ResponseEntity<RatingDTO> update(
             @ApiBodyObject
             @RequestBody RatingDTO rating) {
-        ratingService.update(rating);
+        return ratingResponse(ratingService.update(rating));
     }
 
     @ApiMethod(description = "Deletes rating object")
@@ -66,6 +73,10 @@ public class RatingController {
             @ApiPathParam(description = "Rating ID", name = "ratingId")
             @PathVariable Long ratingId) {
         ratingService.delete(ratingId);
+    }
+
+    private ResponseEntity<RatingDTO> ratingResponse(RatingDTO rating) {
+        return rating != null ? new ResponseEntity<>(rating, HttpStatus.OK) : new ResponseEntity(HttpStatus.NOT_FOUND);
     }
 }
 
