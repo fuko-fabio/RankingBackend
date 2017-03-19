@@ -5,13 +5,14 @@ import com.nps.ranking.model.dto.OverallRatingDTO;
 import com.nps.ranking.model.entity.OverallRating;
 import com.nps.ranking.model.repository.OverallRatingsRepository;
 import com.nps.ranking.model.repository.RatingsRepository;
-import com.nps.ranking.service.api.IItemDataProvider;
+import com.nps.ranking.provider.api.ItemDataProvider;
 import com.nps.ranking.service.api.IOverallRatingsService;
 import org.apache.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -27,7 +28,7 @@ public class OverallRatingsService implements IOverallRatingsService {
     private static final Logger LOGGER = Logger.getLogger(OverallRatingsService.class);
     private final RatingsRepository ratingsRepository;
     private final OverallRatingsRepository overallRatingsRepository;
-    private final IItemDataProvider itemDataProvider;
+    private final ItemDataProvider itemDataProvider;
     private final Configuration configuration;
     private final ModelMapper modelMapper;
     private final ExecutorService executor;
@@ -47,20 +48,8 @@ public class OverallRatingsService implements IOverallRatingsService {
     @Override
     public Page<OverallRatingDTO> getPaginated(int page, int size, String raterId) {
         LOGGER.debug(String.format("Get overall ratings page: %s size: %s", page, size));
-
-        Page<OverallRatingDTO> list = overallRatingsRepository.findAll(new PageRequest(page, size)).map((overallRating) -> {
-            OverallRatingDTO dto = modelMapper.map(overallRating, OverallRatingDTO.class);
-            if (raterId != null) {
-                LOGGER.debug(String.format("Merging 'rated' property for rater ID: %s", raterId));
-                dto.setRated(isRatedBy(overallRating.getItemId(), raterId));
-            }
-            if (configuration.isExternalItemDataEnabled()) {
-                LOGGER.debug("Fetching item data for list entry.");
-                dto.setItemData(itemDataProvider.getData(dto.getItemId()));
-            }
-            return dto;
-        });
-        return list;
+        PageRequest pageRequest = new PageRequest(page, size, new Sort(Sort.Direction.DESC, "rating"));
+        return overallRatingsRepository.findAll(pageRequest).map((overallRating) -> toDto(overallRating, raterId));
     }
 
     @Override
@@ -82,14 +71,33 @@ public class OverallRatingsService implements IOverallRatingsService {
         });
     }
 
+    @Override
+    public OverallRatingDTO getOverallRating(Long id, String raterId) {
+        return toDto(overallRatingsRepository.findOne(id), raterId);
+    }
+
+    private OverallRatingDTO toDto(OverallRating overallRating, String raterId) {
+        OverallRatingDTO dto = modelMapper.map(overallRating, OverallRatingDTO.class);
+
+        if (raterId != null) {
+            LOGGER.debug(String.format("Merging 'rated' property for rater ID: %s", raterId));
+            dto.setRated(isRatedBy(dto.getItemId(), raterId));
+        }
+        if (configuration.isExternalItemDataEnabled()) {
+            LOGGER.debug("Fetching item data for list item with ID: " + dto.getItemId());
+            dto.setItemData(itemDataProvider.getData(dto.getItemId()));
+        }
+        return dto;
+    }
+
     private boolean isRatedBy(String itemId, String raterId) {
         return ratingsRepository.findByItemIdAndRaterId(itemId, raterId) != null;
     }
 
-    private IItemDataProvider getItemDataProvider() {
+    private ItemDataProvider getItemDataProvider() {
         try {
             Class<?> c = Class.forName(configuration.getExternalItemDataProvider());
-            return (IItemDataProvider) c.newInstance();
+            return (ItemDataProvider) c.newInstance();
         } catch(Exception e){
             LOGGER.error("Unable to instantiate item data provider of class: " + configuration.getExternalItemDataProvider());
             throw new IllegalStateException(e);

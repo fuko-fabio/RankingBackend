@@ -1,7 +1,7 @@
-package com.nps.ranking.provider;
+package com.nps.ranking.provider.impl;
 
 import com.github.javafaker.Faker;
-import com.nps.ranking.service.api.IItemDataProvider;
+import com.nps.ranking.provider.api.ItemDataProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created by Norbert Pabian on 18.03.17
  */
-public class FakeDataProvider implements IItemDataProvider {
+public class FakeDataProvider extends ItemDataProvider {
 
     private final Faker faker;
 
@@ -26,5 +26,10 @@ public class FakeDataProvider implements IItemDataProvider {
         item.put("publisher", faker.book().publisher());
         item.put("cover", faker.internet().image());
         return item;
+    }
+
+    @Override
+    protected String getPropertiesFileName() {
+        return null;
     }
 }

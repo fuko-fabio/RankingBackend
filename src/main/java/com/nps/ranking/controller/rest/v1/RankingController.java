@@ -1,6 +1,7 @@
 package com.nps.ranking.controller.rest.v1;
 
 import com.nps.ranking.model.dto.OverallRatingDTO;
+import com.nps.ranking.model.entity.OverallRating;
 import com.nps.ranking.service.api.IOverallRatingsService;
 import com.nps.ranking.service.impl.OverallRatingsService;
 import org.jsondoc.core.annotation.*;
@@ -29,7 +30,7 @@ public class RankingController {
 
     @ApiMethod(description = "Returns pageable items ranking")
     @RequestMapping(method = RequestMethod.GET)
-    public @ApiResponseObject Page<OverallRatingDTO> get(
+    public @ApiResponseObject Page<OverallRatingDTO> getPage(
             @ApiQueryParam(description = "Page number")
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @ApiQueryParam(description = "Page size")
@@ -37,5 +38,14 @@ public class RankingController {
             @ApiQueryParam(description = "Rater ID")
             @RequestParam(value = "raterId", required = false) String raterId) {
         return overallRatingService.getPaginated(page, size, raterId);
+    }
+
+    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    public @ApiResponseObject OverallRatingDTO getOverallRating(
+            @ApiPathParam(description = "Overall rating ID")
+            @PathVariable Long id,
+            @ApiQueryParam(description = "Rater ID")
+            @RequestParam(value = "raterId", required = false) String raterId) {
+        return overallRatingService.getOverallRating(id, raterId);
     }
 }

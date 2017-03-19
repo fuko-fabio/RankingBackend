@@ -1,6 +1,7 @@
 package com.nps.ranking.service.api;
 
 import com.nps.ranking.model.dto.OverallRatingDTO;
+import com.nps.ranking.model.entity.OverallRating;
 import org.springframework.data.domain.Page;
 
 /**
@@ -11,4 +12,6 @@ public interface IOverallRatingsService {
     Page<OverallRatingDTO> getPaginated(int page, int size, String raterId);
 
     void onRatingChanged(String itemId);
+
+    OverallRatingDTO getOverallRating(Long id, String raterId);
 }
