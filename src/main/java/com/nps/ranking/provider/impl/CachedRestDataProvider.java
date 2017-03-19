@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 public class CachedRestDataProvider extends BaseRestDataProvider {
     private static final Logger LOGGER = Logger.getLogger(CachedRestDataProvider.class);
     private static final String PROPERTIES_FILE = "cached-rest-data-provider.properties";
-    private static final String ID_PLACEHOLDER = "%{id}";
-    private static final String URL_PROPERTY = "url";
 
     private final LoadingCache<String, Map> items;
 

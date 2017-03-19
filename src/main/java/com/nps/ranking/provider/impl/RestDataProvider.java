@@ -3,7 +3,6 @@ package com.nps.ranking.provider.impl;
 import com.nps.ranking.provider.DataProviderException;
 import org.apache.log4j.Logger;
 
-import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;

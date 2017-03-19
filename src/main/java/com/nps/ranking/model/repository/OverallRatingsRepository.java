@@ -1,10 +1,7 @@
 package com.nps.ranking.model.repository;
 
 import com.nps.ranking.model.entity.OverallRating;
-import com.nps.ranking.model.entity.Rating;
 import org.springframework.data.repository.PagingAndSortingRepository;
-
-import java.util.List;
 
 /**
  * Created by Norbert Pabian on 17.03.17

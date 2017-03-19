@@ -1,7 +1,6 @@
 package com.nps.ranking.controller.rest.v1;
 
 import com.nps.ranking.model.dto.OverallRatingDTO;
-import com.nps.ranking.model.entity.OverallRating;
 import com.nps.ranking.service.api.IOverallRatingsService;
 import com.nps.ranking.service.impl.OverallRatingsService;
 import org.jsondoc.core.annotation.*;
@@ -9,12 +8,9 @@ import org.jsondoc.core.pojo.ApiStage;
 import org.jsondoc.core.pojo.ApiVisibility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.xml.ws.Response;
 
 /**
  * Created by Norbert Pabian on 17.03.17

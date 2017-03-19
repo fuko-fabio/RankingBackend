@@ -17,13 +17,13 @@ import java.util.Map;
 /**
  * Created by Norbert Pabian on 19.03.17
  */
-public abstract class BaseRestDataProvider extends ItemDataProvider {
+abstract class BaseRestDataProvider extends ItemDataProvider {
     private static final Logger LOGGER = Logger.getLogger(BaseRestDataProvider.class);
-    protected static final String ID_PLACEHOLDER = "%{id}";
-    protected static final String URL_PROPERTY = "url";
+    static final String ID_PLACEHOLDER = "%{id}";
+    static final String URL_PROPERTY = "url";
 
     @NotNull
-    protected Map requestData(URL url) {
+    Map requestData(URL url) {
         Map result = null;
         try {
             LOGGER.debug("Reading item data from: " + url.toString());
